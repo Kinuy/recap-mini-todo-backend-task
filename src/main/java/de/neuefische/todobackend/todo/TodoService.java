@@ -11,19 +11,23 @@ public class TodoService {
     private final TodoRepository todoRepository;
     private final IdService idService;
 
-    public TodoService(TodoRepository todoRepository, IdService idService) {
+    private final ChatGptApiService chatGptApiService;
+
+    public TodoService(TodoRepository todoRepository, IdService idService, ChatGptApiService chatGptApiService) {
         this.todoRepository = todoRepository;
         this.idService = idService;
+        this.chatGptApiService = chatGptApiService;
     }
 
     public List<Todo> findAllTodos() {
         return todoRepository.findAll();
     }
 
-    public Todo addTodo(NewTodo newTodo) {
+    public Todo addTodo(NewTodo newTodo) throws Exception {
         String id = idService.randomId();
 
-        Todo todoToSave = new Todo(id, newTodo.description(), newTodo.status());
+        String correctedDescription = chatGptApiService.checkTaskSpelling(newTodo.description());
+        Todo todoToSave = new Todo(id, correctedDescription, newTodo.status());
 
         return todoRepository.save(todoToSave);
     }

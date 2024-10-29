@@ -10,6 +10,7 @@ public class TodoController {
 
     private final TodoService todoService;
 
+
     public TodoController(TodoService todoService) {
         this.todoService = todoService;
     }
@@ -25,7 +26,7 @@ public class TodoController {
     }
 
     @PostMapping
-    public Todo postTodo(@RequestBody NewTodo newTodo) {
+    public Todo postTodo(@RequestBody NewTodo newTodo) throws Exception {
         return todoService.addTodo(newTodo);
     }
 
