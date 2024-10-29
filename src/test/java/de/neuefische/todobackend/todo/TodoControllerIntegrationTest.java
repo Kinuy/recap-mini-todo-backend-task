@@ -3,10 +3,12 @@ package de.neuefische.todobackend.todo;
 import jakarta.servlet.ServletException;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.client.AutoConfigureMockRestServiceServer;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
@@ -16,13 +18,17 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
-class TodoControllerTest {
+@AutoConfigureMockRestServiceServer
+class TodoControllerIntegrationTest {
 
     @Autowired
     MockMvc mockMvc;
 
     @Autowired
     TodoRepository todoRepository;
+
+    @Autowired
+    MockRestServiceServer mockServer;
 
     @Test
     void getAllTodos() throws Exception {
@@ -38,6 +44,8 @@ class TodoControllerTest {
                         """));
 
     }
+
+
 
     @Test
     @DirtiesContext
@@ -111,6 +119,24 @@ class TodoControllerTest {
                                 "status": "OPEN"
                             }
                         """));
+
+    }
+
+    @Test
+    void getById_whenGivenUnavailableId_ThenThrowException() throws Exception {
+        //GIVEN
+
+        //WHEN
+        mockMvc.perform(get("/api/todo/2000"))
+                //THEN
+                .andExpect(status().isNotFound())
+                .andExpect(content().json("""                             
+                                            
+                                            {
+                                                "content": "Todo with id: 2000 not found! global"
+                                            }
+                                            
+                                            """));
 
     }
 
